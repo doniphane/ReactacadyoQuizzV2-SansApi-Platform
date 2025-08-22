@@ -205,6 +205,7 @@ export interface Question {
   text: string;
   order: number;
   answers: Answer[];
+  isMultipleChoice: boolean;
 }
 
 export interface UserAnswers {
@@ -223,6 +224,7 @@ export interface ApiQuestion {
   id: number;
   texte: string;
   numeroOrdre: number;
+  isMultipleChoice: boolean;
   reponses: Array<{
     id: number;
     texte: string;

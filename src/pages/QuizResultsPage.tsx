@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
-import type { AxiosResponse } from "axios";
 
 import { MainResultsCard, AnswerDetailsCard, ActionsCard } from "../components";
 
@@ -36,46 +34,55 @@ function QuizResultsPage() {
         interface ApiResultItem {
           questionId: number;
           questionTexte: string;
-          reponseSelectionnee: {
+          isMultipleChoice: boolean;
+          reponsesSelectionnees: Array<{
             id: number;
             texte: string;
             estCorrecte: boolean;
-          };
-          bonneReponse?: {
+          }>;
+          bonnesReponses: Array<{
             id: number;
             texte: string;
-          };
+            estCorrecte: boolean;
+          }>;
+          estCorrecte: boolean;
         }
         interface ApiResult {
           resultats: ApiResultItem[];
           score: number;
         }
 
-        const response: AxiosResponse<ApiResult> = await axios.get(
+        const response = await fetch(
           `${API_BASE_URL}/api/public/questionnaires/tentative/${tentativeId}`
         );
-        const data = response.data;
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data: ApiResult = await response.json();
 
         const userAnswersDetails = data.resultats.map(
           (resultat: ApiResultItem) => {
-            const userAnswer = {
-              id: resultat.reponseSelectionnee.id,
-              texte: resultat.reponseSelectionnee.texte,
-            };
-            const correctAnswer = resultat.bonneReponse
-              ? {
-                  id: resultat.bonneReponse.id,
-                  texte: resultat.bonneReponse.texte,
-                }
-              : null;
+            // Mapper les réponses utilisateur
+            const userAnswers = resultat.reponsesSelectionnees.map(reponse => ({
+              id: reponse.id,
+              texte: reponse.texte,
+            }));
+
+            // Mapper les bonnes réponses
+            const correctAnswers = resultat.bonnesReponses.map(reponse => ({
+              id: reponse.id,
+              texte: reponse.texte,
+            }));
 
             return {
               questionId: resultat.questionId,
               questionText: resultat.questionTexte,
-              userAnswers: [userAnswer],
-              correctAnswers: correctAnswer ? [correctAnswer] : [],
-              isCorrect: resultat.reponseSelectionnee.estCorrecte,
-              isMultipleChoice: false,
+              userAnswers: userAnswers,
+              correctAnswers: correctAnswers,
+              isCorrect: resultat.estCorrecte,
+              isMultipleChoice: resultat.isMultipleChoice,
             };
           }
         );

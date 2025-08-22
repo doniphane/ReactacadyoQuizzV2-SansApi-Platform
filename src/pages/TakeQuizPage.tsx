@@ -29,8 +29,8 @@ function TakeQuizPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isMultipleChoiceQuestion = (): boolean => {
-    
-    return false;
+    const currentQuestion = questions[currentQuestionIndex];
+    return currentQuestion ? currentQuestion.isMultipleChoice : false;
   };
 
   const handleBackToStudent = () => {
@@ -113,7 +113,8 @@ function TakeQuizPage() {
           (apiQuestion: ApiQuestion) => ({
             id: apiQuestion.id,
             text: apiQuestion.texte,
-            orderNumber: apiQuestion.numeroOrdre,
+            order: apiQuestion.numeroOrdre,
+            isMultipleChoice: apiQuestion.isMultipleChoice,
             answers: apiQuestion.reponses.map((reponse) => ({
               id: reponse.id,
               text: reponse.texte,
@@ -146,11 +147,24 @@ function TakeQuizPage() {
     setIsSubmitting(true);
     try {
     
-      const reponses = Object.entries(userAnswers).map(
-        ([questionId, answerId]) => ({
-          questionId: parseInt(questionId),
-          reponseId: Array.isArray(answerId) ? answerId[0] : answerId,
-        })
+      // Traiter les réponses en gérant les choix multiples
+      const reponses = Object.entries(userAnswers).flatMap(
+        ([questionId, answerId]) => {
+          const questionIdInt = parseInt(questionId);
+          if (Array.isArray(answerId)) {
+            // Question à choix multiple - créer une entrée pour chaque réponse
+            return answerId.map(id => ({
+              questionId: questionIdInt,
+              reponseId: id,
+            }));
+          } else {
+            // Question à choix unique
+            return [{
+              questionId: questionIdInt,
+              reponseId: answerId,
+            }];
+          }
+        }
       );
 
      
@@ -264,14 +278,26 @@ function TakeQuizPage() {
     </div>
   );
 
-  const ProgressSection = ({ progress }: { progress: number }) => (
-    <div className="mb-8">
-      <Progress value={progress} className="h-2" />
-      <p className="text-center text-sm text-gray-400 mt-2">
-        {Math.round(progress)}% complété
-      </p>
-    </div>
-  );
+  const ProgressSection = ({ progress }: { progress: number }) => {
+    const currentQuestion = questions[currentQuestionIndex];
+    const isMultiple = currentQuestion?.isMultipleChoice;
+    
+    return (
+      <div className="mb-8">
+        <Progress value={progress} className="h-2 [&>*]:bg-yellow-400" />
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-sm text-gray-400">
+            {Math.round(progress)}% complété
+          </p>
+          {currentQuestion && (
+            <p className="text-sm text-yellow-400 font-medium">
+              {isMultiple ? "Choix multiple" : "Choix unique"}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   const QuestionCard = ({
     currentQuestion,
@@ -279,45 +305,54 @@ function TakeQuizPage() {
   }: {
     currentQuestion: Question;
     currentAnswer: number | number[] | undefined;
-  }) => (
-    <Card className="bg-gray-800 border-gray-700 mb-6">
-      <CardHeader>
-        <CardTitle className="text-xl text-white">
-          {currentQuestion.text}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {currentQuestion.answers.map((answer) => {
-          const isSelected = Array.isArray(currentAnswer)
-            ? currentAnswer.includes(answer.id)
-            : currentAnswer === answer.id;
+  }) => {
+    const isMultiple = currentQuestion.isMultipleChoice;
+    
+    return (
+      <Card className="bg-gray-800 border-gray-700 mb-6">
+        <CardHeader>
+          <CardTitle className="text-xl text-white">
+            {currentQuestion.text}
+          </CardTitle>
+          <p className="text-sm text-yellow-400 mt-2">
+            {isMultiple ? "Sélectionnez une ou plusieurs réponses" : "Sélectionnez une seule réponse"}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {currentQuestion.answers.map((answer) => {
+            const isSelected = Array.isArray(currentAnswer)
+              ? currentAnswer.includes(answer.id)
+              : currentAnswer === answer.id;
 
-          return (
-            <button
-              key={answer.id}
-              onClick={() => handleAnswerSelect(currentQuestion.id, answer.id)}
-              className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
-                isSelected
-                  ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
-                  : "border-gray-600 bg-gray-700 text-white hover:border-gray-500"
-              }`}
-            >
-              <div className="flex items-center">
-                <div
-                  className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                    isSelected
-                      ? "border-yellow-400 bg-yellow-400"
-                      : "border-gray-400"
-                  }`}
-                />
-                {answer.text}
-              </div>
-            </button>
-          );
-        })}
-      </CardContent>
-    </Card>
-  );
+            return (
+              <button
+                key={answer.id}
+                onClick={() => handleAnswerSelect(currentQuestion.id, answer.id)}
+                className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
+                  isSelected
+                    ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
+                    : "border-gray-600 bg-gray-700 text-white hover:border-gray-500"
+                }`}
+              >
+                <div className="flex items-center">
+                  <div
+                    className={`w-4 h-4 border-2 mr-3 ${
+                      isMultiple ? "rounded" : "rounded-full"
+                    } ${
+                      isSelected
+                        ? "border-yellow-400 bg-yellow-400"
+                        : "border-gray-400"
+                    }`}
+                  />
+                  {answer.text}
+                </div>
+              </button>
+            );
+          })}
+        </CardContent>
+      </Card>
+    );
+  };
 
   const NavigationButtons = ({
     hasAnswered,
