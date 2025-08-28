@@ -6,9 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ChevronRight, Send } from "lucide-react";
 import toast from "react-hot-toast";
 import type {
-  LocationState,
-  Question,
-  QuizResults,
+  TakeQuizLocationState,
+  TakeQuizQuestion,
+  TakeQuizResults,
   ApiQuestion,
 } from "../types";
 
@@ -19,8 +19,8 @@ function TakeQuizPage() {
   const location = useLocation();
 
   
-  const state = location.state as LocationState;
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const state = location.state as TakeQuizLocationState;
+  const [questions, setQuestions] = useState<TakeQuizQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<
     Record<number, number | number[]>
@@ -109,7 +109,7 @@ function TakeQuizPage() {
 
       if (quizData.questions && Array.isArray(quizData.questions)) {
         // Formatter les questions pour l'interface
-        const formattedQuestions: Question[] = quizData.questions.map(
+        const formattedQuestions: TakeQuizQuestion[] = quizData.questions.map(
           (apiQuestion: ApiQuestion) => ({
             id: apiQuestion.id,
             text: apiQuestion.texte,
@@ -192,7 +192,7 @@ function TakeQuizPage() {
           : Math.round((bonnesReponses / Math.max(totalQuestions, 1)) * 100);
       const passed = percentage >= (state.quizInfo.scorePassage ?? 50);
 
-      const results: QuizResults = {
+      const results: TakeQuizResults = {
         score: bonnesReponses,
         maxScore: totalQuestions,
         percentage,
@@ -303,7 +303,7 @@ function TakeQuizPage() {
     currentQuestion,
     currentAnswer,
   }: {
-    currentQuestion: Question;
+    currentQuestion: TakeQuizQuestion;
     currentAnswer: number | number[] | undefined;
   }) => {
     const isMultiple = currentQuestion.isMultipleChoice;
@@ -319,7 +319,7 @@ function TakeQuizPage() {
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
-          {currentQuestion.answers.map((answer) => {
+          {currentQuestion.answers.map((answer: { id: number; text: string; isCorrect: boolean }) => {
             const isSelected = Array.isArray(currentAnswer)
               ? currentAnswer.includes(answer.id)
               : currentAnswer === answer.id;

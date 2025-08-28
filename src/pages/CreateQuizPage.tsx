@@ -8,44 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AuthService from "../services/AuthService";
+import type {
+  CreateQuizFormData,
+  QuizDataToSend,
+  QuizResponse,
+  ValidationViolation,
+  ServerErrorData,
+} from "../types";
 
-
-interface CreateQuizFormData {
-  title: string;
-  description: string;
-}
-
-
-interface QuizDataToSend {
-  title: string;
-  description: string;
-  estActif: boolean;
-  estDemarre: boolean;
-  scorePassage: number;
-}
-
-
-interface QuizResponse {
-  id: number;
-  title: string;
-  description: string;
-  accessCode: string;
-  uniqueCode: string;
-  isActive: boolean;
-  isStarted: boolean;
-  scorePassage: number;
-  createdAt: string;
-}
-
-
-interface ValidationViolation {
-  message: string;
-}
-
-interface ServerErrorData {
-  violations?: ValidationViolation[];
-  detail?: string;
-}
 
 function CreateQuizPage() {
   const navigate = useNavigate();
@@ -395,7 +365,7 @@ function CreateQuizPage() {
 
   const QuizForm = () => (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Champ titre */}
+      
       <FormField
         label="Titre du quiz"
         id="title"
@@ -427,11 +397,11 @@ function CreateQuizPage() {
         fieldName="description"
         validation={{
           maxLength: {
-            value: 500,
+            value: 100,
             message: "La description ne peut pas dépasser 500 caractères",
           },
         }}
-        maxLength={500}
+        maxLength={100}
       />
 
    

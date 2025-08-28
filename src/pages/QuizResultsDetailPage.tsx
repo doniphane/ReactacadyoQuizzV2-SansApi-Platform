@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import AuthService from '../services/AuthService';
 import { QuizMetrics, StudentsList, StudentResultsDetail, exportAllResultsPDF, exportStudentResultPDF } from '../components';
-import type { Student, AnswerDetail, Metrics, QuizResultsNavigationState, ApiQuestionData, ApiAnswerData } from '@/types';
+import type { Student, AnswerDetail, Metrics, QuizResultsNavigationState, ApiQuestionData, ApiAnswerData, BackendAttempt } from '@/types';
 
 
 
@@ -19,16 +19,6 @@ interface ApiResponse {
   'hydra:member'?: unknown[];
 }
 
-
-interface BackendAttempt {
-  id: number;
-  prenomParticipant: string;
-  nomParticipant: string;
-  dateDebut: string;
-  score?: number;
-  nombreTotalQuestions?: number;
-  questionnaire: string | { id: number };
-}
 
 function QuizResultsDetailPage() {
   const navigate = useNavigate();

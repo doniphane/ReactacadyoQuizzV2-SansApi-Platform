@@ -3,7 +3,7 @@ import React from "react";
 const LegalMentionsPage: React.FC = () => {
   return (
     <main className="min-h-screen bg-gray-950 text-gray-100">
-      {/* Header */}
+   
       <header className="bg-gray-900 border-b border-gray-800">
         <div className="max-w-5xl mx-auto px-4 py-8">
           <h1 className="text-3xl md:text-4xl font-extrabold text-yellow-400">
@@ -16,9 +16,9 @@ const LegalMentionsPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Main content */}
+
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
-        {/* Sommaire */}
+ 
         <nav aria-label="Sommaire" className="bg-gray-900/60 rounded-2xl p-5 border border-gray-800">
           <h2 className="font-semibold text-yellow-300 mb-3">Sommaire</h2>
           <ul className="list-disc list-inside grid md:grid-cols-2 gap-y-1 text-gray-200">
@@ -30,7 +30,7 @@ const LegalMentionsPage: React.FC = () => {
           </ul>
         </nav>
 
-        {/* Éditeur */}
+  
         <section id="editeur" className="bg-gray-900/60 rounded-2xl p-6 border border-gray-800">
           <h2 className="text-2xl font-bold text-yellow-300">1) Éditeur du site</h2>
           <ul className="list-disc list-inside mt-3 space-y-1">
@@ -41,7 +41,7 @@ const LegalMentionsPage: React.FC = () => {
           </ul>
         </section>
 
-        {/* Hébergeur */}
+ 
         <section id="hebergeur" className="bg-gray-900/60 rounded-2xl p-6 border border-gray-800">
           <h2 className="text-2xl font-bold text-yellow-300">2) Hébergement</h2>
           <p className="mt-3">
@@ -58,7 +58,7 @@ const LegalMentionsPage: React.FC = () => {
           </ul>
         </section>
 
-        {/* Propriété intellectuelle */}
+
         <section id="propriete" className="bg-gray-900/60 rounded-2xl p-6 border border-gray-800">
           <h2 className="text-2xl font-bold text-yellow-300">3) Propriété intellectuelle</h2>
           <p className="mt-3">
@@ -68,7 +68,7 @@ const LegalMentionsPage: React.FC = () => {
           </p>
         </section>
 
-        {/* Responsabilité */}
+
         <section id="responsabilite" className="bg-gray-900/60 rounded-2xl p-6 border border-gray-800">
           <h2 className="text-2xl font-bold text-yellow-300">4) Responsabilité</h2>
           <p className="mt-3">
@@ -81,7 +81,7 @@ const LegalMentionsPage: React.FC = () => {
           </ul>
         </section>
 
-        {/* Contact */}
+   
         <section id="contact" className="bg-gray-900/60 rounded-2xl p-6 border border-gray-800">
           <h2 className="text-2xl font-bold text-yellow-300">5) Contact</h2>
           <p className="mt-3">

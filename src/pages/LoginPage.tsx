@@ -6,18 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface LocationState {
-    from?: Location;
-    error?: string;
-    successMessage?: string;
-}
-
-
-interface LoginFormData {
-    email: string;
-    password: string;
-}
+import type { LocationState, LoginFormData } from "../types";
 
 function LoginPage() {
     const navigate = useNavigate();
