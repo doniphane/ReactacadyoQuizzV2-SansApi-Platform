@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, Layout, ProtectedRoute } from './components';
+import Footer from './components/Footer';
 
 // Import de toutes les pages
 import {
@@ -12,10 +13,13 @@ import {
     ManageQuestionsPage,
     QuizResultsPage,
     QuizResultsDetailPage,
-    StudentHistoryPage
+    StudentHistoryPage,
+    PrivacyPolicyPage,
+    LegalMentionsPage,
+    CookiePolicyPage
 } from './pages';
 
-// Interface pour définir une route avec ses propriétés
+
 interface AppRoute {
     path: string;
     element: React.ReactNode;
@@ -34,6 +38,21 @@ const publicRoutes: AppRoute[] = [
         path: '/register',
         element: <RegisterPage />,
         description: 'Page d\'inscription pour tous les utilisateurs'
+    },
+    {
+        path: '/privacy-policy-page',
+        element: <PrivacyPolicyPage />,
+        description: 'Politique de Confidentialité'
+    },
+    {
+        path: '/legal-mentions-page',
+        element: <LegalMentionsPage />,
+        description: 'Mentions Légales'
+    },
+    {
+        path: '/cookie-policy-page',
+        element: <CookiePolicyPage />,
+        description: 'Politique de Cookies'
     }
 ];
 
@@ -128,13 +147,13 @@ function App() {
                     <Route path="/" element={<Layout />}>
                         {/* Routes publiques - accessibles à tous les utilisateurs */}
                         {publicRoutes.map(createProtectedRoute)}
-                        
+
                         {/* Routes pour les étudiants - nécessitent ROLE_USER */}
                         {studentRoutes.map(createProtectedRoute)}
-                        
+
                         {/* Routes pour les administrateurs - nécessitent ROLE_ADMIN */}
                         {adminRoutes.map(createProtectedRoute)}
-                        
+
                         {/* Routes par défaut - redirection intelligente selon l'authentification */}
                         <Route 
                             index 
@@ -144,7 +163,7 @@ function App() {
                                 </ProtectedRoute>
                             } 
                         />
-                        
+
                         {/* Route pour les URLs non trouvées - redirige vers la connexion */}
                         <Route 
                             path="*" 
@@ -152,6 +171,7 @@ function App() {
                         />
                     </Route>
                 </Routes>
+                <Footer />
             </AuthProvider>
         </Router>
     );
