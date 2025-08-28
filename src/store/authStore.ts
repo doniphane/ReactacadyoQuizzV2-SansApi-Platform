@@ -1,7 +1,6 @@
 
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import AuthService from '../services/AuthService';
 import type { User } from '../types';
 
@@ -23,10 +22,7 @@ export type Auth = {
   isStudent: () => boolean;
 };
 
-
-export const useAuthStore = create<Auth>()(
-  persist(
-    (set, get) => ({
+export const useAuthStore = create<Auth>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
@@ -51,6 +47,8 @@ export const useAuthStore = create<Auth>()(
       if (result.success) {
         // Récupérer les informations de l'utilisateur
         const user = await AuthService.getCurrentUser();
+        console.log('Nouvel utilisateur connecté:', user);
+        
         set({ 
           user, 
           isAuthenticated: true, 
@@ -86,8 +84,9 @@ export const useAuthStore = create<Auth>()(
     try {
       await AuthService.logout();
     } catch {
-      // Ignore logout errors a changer 
+      // Ignore logout errors 
     } finally {
+      // Nettoyer complètement le state
       set({ 
         user: null, 
         isAuthenticated: false, 
@@ -152,7 +151,8 @@ export const useAuthStore = create<Auth>()(
   // Vérifier si l'utilisateur est admin
   isAdmin: (): boolean => {
     const state = get();
-    return state.hasRole('ROLE_ADMIN');
+    // Vérifier les deux variantes possibles du rôle admin
+    return state.hasRole('ROLE_ADMIN') || state.hasRole('ROLE8ADMIN');
   },
 
   // Vérifier si l'utilisateur est étudiant
@@ -160,17 +160,7 @@ export const useAuthStore = create<Auth>()(
     const state = get();
     return state.hasRole('ROLE_USER');
   }
-}),
-    {
-      name: 'auth-storage', 
-      partialize: (state) => ({ 
-        user: state.user, 
-        isAuthenticated: state.isAuthenticated 
-      }), 
-    }
-  )
-);
-
+}));
 
 export const useAuth = () => {
   const store = useAuthStore();
