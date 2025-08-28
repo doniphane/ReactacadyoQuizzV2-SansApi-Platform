@@ -7,45 +7,17 @@ import { AttemptsList, AttemptDetails, SearchBar } from '../components';
 import AuthService from '../services/AuthService';
 import toast from 'react-hot-toast';
 import type { TransformedAttempt, AttemptDetail } from '@/types';
-
+import type {
+  ApiAttempt,
+  ApiAttemptDetail,
+  ApiAttemptDetailResponse,
+  HydraCollection,
+} from "../types";
+import type { AttemptWithNames } from "../types";
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
-interface ApiAttempt {
-  id: number;
-  questionnaireTitre: string;
-  questionnaireCode: string;
-  date: string;
-  heure: string;
-  score: number;
-  nombreTotalQuestions: number;
-  pourcentage: number;
-  estReussi: boolean;
-}
-
-
-interface ApiAttemptDetail {
-  questionId: string;
-  questionTexte: string;
-  reponseUtilisateurTexte: string;
-  reponseCorrecteTexte: string;
-  estCorrecte: boolean;
-}
-
-
-interface ApiAttemptDetailResponse {
-  reponsesDetails: ApiAttemptDetail[];
-}
-
-
-interface HydraCollection<T> {
-  'hydra:member'?: T[];
-  member?: T[];
-}
-
-type AttemptWithNames = TransformedAttempt & { prenomParticipant?: string; nomParticipant?: string };
 
 function StudentHistoryPage() {
   const navigate = useNavigate();

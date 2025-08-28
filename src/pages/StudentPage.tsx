@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,18 +11,8 @@ import { LogOut, History, Menu, X } from 'lucide-react';
 
 import AuthService from '../services/AuthService';
 import { StudentAccessForm } from '@/components';
+import type { QuizInfo } from '../types';
 
-
-interface QuizInfo {
-	id: number;
-	title: string;
-	description?: string;
-	isActive: boolean;
-	isStarted: boolean;
-	accessCode: string;
-	scorePassage?: number;
-	questions?: unknown[];
-}
 
 function StudentPage() {
 	const navigate = useNavigate();
