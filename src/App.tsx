@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, Layout, ProtectedRoute } from './components';
-import Footer from './components/Footer';
+import { AuthProvider, ProtectedRoute, Layout, Footer, SmartRedirect } from './components';
 
 // Import de toutes les pages
 import {
@@ -154,14 +153,10 @@ function App() {
                         {/* Routes pour les administrateurs - nécessitent ROLE_ADMIN */}
                         {adminRoutes.map(createProtectedRoute)}
 
-                        {/* Routes par défaut - redirection intelligente selon l'authentification */}
+                        {/* Routes par défaut - redirection intelligente selon le rôle utilisateur */}
                         <Route 
                             index 
-                            element={
-                                <ProtectedRoute>
-                                    <Navigate to="/student" replace />
-                                </ProtectedRoute>
-                            } 
+                            element={<SmartRedirect />} 
                         />
 
                         {/* Route pour les URLs non trouvées - redirige vers la connexion */}

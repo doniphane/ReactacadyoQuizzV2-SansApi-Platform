@@ -1,6 +1,7 @@
 
 export { default as ProtectedRoute } from './ProtectedRoute';
 export { default as AuthProvider } from './AuthProvider';
+export { default as SmartRedirect } from './SmartRedirect';
 
 
 export { default as ListeQuiz } from './ListeQuiz';
@@ -33,6 +34,7 @@ export { default as SearchBar } from './SearchBar';
 
 export { default as Layout } from './Layout';
 export { default as LoadingScreen } from './LoadingScreen';
+export { default as Footer } from './Footer';
 
 
 export { default as StudentAccessForm } from './StudentAccessForm';

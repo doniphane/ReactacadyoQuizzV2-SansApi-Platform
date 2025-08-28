@@ -1,6 +1,6 @@
 
 export const COOKIE_OPTIONS = {
-    secure: import.meta.env.PROD, 
+    secure: true, 
     sameSite: 'lax' as const,  
     expires: 7,        
 };
