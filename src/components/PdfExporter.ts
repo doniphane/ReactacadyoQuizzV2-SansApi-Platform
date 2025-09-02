@@ -67,8 +67,8 @@ export const exportAllResultsPDF = (data: GlobalExportData): void => {
                 y = 20;
             }
 
-            doc.text(student.name, 20, y);
-            doc.text(student.date, 80, y);
+            doc.text(student.name || 'N/A', 20, y);
+            doc.text(student.date || 'N/A', 80, y);
             doc.text(`${student.score}/${student.totalQuestions}`, 130, y);
             doc.text(`${student.percentage}%`, 170, y);
             y += 10;
@@ -137,7 +137,7 @@ export const exportStudentResultPDF = (data: IndividualExportData): void => {
         });
 
         // Sauvegarder
-        const filename = `resultat_${student.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+        const filename = `resultat_${(student.name || 'student').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(filename);
         toast.success('Export PDF réussi !');
 

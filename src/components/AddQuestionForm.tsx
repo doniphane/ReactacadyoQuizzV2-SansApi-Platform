@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, Plus, Loader2 } from 'lucide-react';
 
 // Import des types
-import type { ApiQuestion } from '../types/managequestion';
-import type { AddQuestionFormData } from '../types/managequestion';
+import type { ApiQuestion } from '../types';
+import type { AddQuestionFormData } from '../types';
 
 // Interface pour les props du composant
 interface AddQuestionFormProps {
@@ -93,10 +93,13 @@ function AddQuestionForm({ quizId, currentQuestionsCount, onSubmit, isSubmitting
 
 			// Préparer les données de la question
 			const questionData: ApiQuestion = {
+				id: 0, // Sera assigné par le backend
 				texte: questionText,
 				numeroOrdre: currentQuestionsCount + 1,
 				questionnaire: quizId,
+				isMultipleChoice: true,
 				reponses: data.answers.map((answer: { text: string; correct: boolean }, index: number) => ({
+					id: 0, // Sera assigné par le backend
 					texte: answer.text.trim(),
 					estCorrecte: answer.correct,
 					numeroOrdre: index + 1

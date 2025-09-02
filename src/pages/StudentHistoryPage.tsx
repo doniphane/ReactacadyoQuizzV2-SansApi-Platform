@@ -83,6 +83,7 @@ function StudentHistoryPage() {
     return attemptDetail.reponsesDetails.map((detail: ApiAttemptDetail) => ({
       questionId: Number(detail.questionId),
       questionText: detail.questionTexte,
+      answer: detail.reponseUtilisateurTexte,
       userAnswer: detail.reponseUtilisateurTexte,
       correctAnswer: detail.reponseCorrecteTexte,
       isCorrect: detail.estCorrecte

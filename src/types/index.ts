@@ -1,4 +1,3 @@
-
 // Types d'authentification
 export type UserRole = 'ROLE_ADMIN' | 'ROLE_USER' | string;
 
@@ -199,15 +198,6 @@ export interface QuizWithQuestions {
   questions: ApiQuestionData[];
 }
 
-export interface ApiQuestion {
-  id: number;
-  texte: string;
-  numeroOrdre: number;
-  questionnaire?: number;
-  isMultipleChoice: boolean;
-  reponses: ApiAnswerData[];
-}
-
 export interface ApiQuestionData {
   id: number;
   texte: string;
@@ -249,6 +239,7 @@ export interface Metrics {
   averageScore: number;
   passRate: number;
   totalQuestions: number;
+  attempts: number;
   bestScore?: number; 
   lowestScore?: number; 
   successRate?: number; 
@@ -316,6 +307,7 @@ export interface TransformedAttempt {
 export interface AttemptDetail {
   questionId: number;
   questionText: string;
+  answer: string;
   userAnswer: string;
   correctAnswer: string;
   isCorrect: boolean;
@@ -404,4 +396,85 @@ export interface UserAnswerDetail {
   userAnswer: number | string;
   correctAnswer: number | string;
   isCorrect: boolean;
+}
+
+// Types pour la gestion des questions
+export interface ApiQuestion {
+  id?: number;
+  texte: string;
+  numeroOrdre: number;
+  questionnaire: number;
+  isMultipleChoice?: boolean;
+  reponses: ApiAnswerData[];
+}
+
+export interface AddQuestionFormData {
+  text: string;
+  answers: {
+    text: string;
+    correct: boolean;
+  }[];
+}
+
+// Types pour les composants
+export interface ListeQuizProps {
+  quizzes: Quiz[];
+  loading: boolean;
+  loadingQuizId: number | null;
+  onToggleStatus: (quizId: number, currentStatus: boolean) => Promise<void>;
+  onDeleteQuiz: (quizId: number, quizTitre: string) => Promise<void>;
+}
+
+export interface MetricsDashboardProps {
+  metrics: AdminMetrics;
+}
+
+export interface QuizMetricsProps {
+  quizId?: number;
+  metrics: Metrics;
+}
+
+export interface StudentResultsDetailProps {
+  selectedStudent: {
+    id: number;
+    name?: string;
+    email?: string;
+    percentage?: number;
+    score?: number;
+    totalQuestions?: number;
+  } | null;
+  studentAnswers: AnswerDetail[];
+  onExportPDF: () => void;
+}
+
+export interface StudentsListProps {
+  students: {
+    id: number;
+    name?: string;
+    email?: string;
+    date?: string;
+    percentage?: number;
+  }[];
+  selectedStudent: {
+    id: number;
+    name?: string;
+  } | null;
+  onStudentSelect: (student: Student) => void;
+}
+
+// Types pour l'authentification
+export interface UserData {
+  id?: number;
+  email: string;
+  roles?: string[];
+  firstName: string;
+  lastName: string;
+  password: string;
+}
+
+export interface ApiErrorResponse {
+  message: string;
+  statusCode: number;
+  violations?: { message: string }[];
+  detail?: string;
 }

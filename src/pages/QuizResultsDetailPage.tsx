@@ -62,6 +62,7 @@ function QuizResultsDetailPage() {
       return {
         totalStudents: 0,
         averageScore: 0,
+        attempts: 0,
         bestScore: 0,
         lowestScore: 0,
         successRate: 0,
@@ -81,6 +82,7 @@ function QuizResultsDetailPage() {
     return {
       totalStudents: studentsList.length,
       averageScore: average,
+      attempts: studentsList.length,
       bestScore: best,
       lowestScore: lowest,
       successRate: success,
