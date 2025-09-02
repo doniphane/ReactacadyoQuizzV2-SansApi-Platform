@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, Clock, Trophy, Target } from 'lucide-react';
-import type { AttemptDetailsProps } from '../types';
+import type { AttemptDetailsProps, AttemptDetail } from '../types';
 
 
 function AttemptDetails({ selectedAttempt, attemptDetails, loadingDetails }: AttemptDetailsProps) {

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 
 // Import des types
-import type { StudentsListProps } from '../types';
+import type { StudentsListProps, Student } from '../types';
 
 function StudentsList({ students, selectedStudent, onStudentSelect }: StudentsListProps) {
     return (
@@ -23,7 +23,7 @@ function StudentsList({ students, selectedStudent, onStudentSelect }: StudentsLi
                                 ? 'bg-blue-100 border-blue-300'
                                 : 'bg-white border-gray-300 hover:bg-gray-50'
                         }`}
-                        onClick={() => onStudentSelect(student)}
+                        onClick={() => onStudentSelect(student as Student)}
                     >
                         <div className="flex justify-between items-center">
                             <div className="flex-1">
