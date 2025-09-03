@@ -122,7 +122,7 @@ function CreateQuizPage() {
       
       const token = AuthService.getToken();
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/questionnaires`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/quizzes`,
         {
           method: 'POST',
           headers: {

@@ -23,7 +23,6 @@ function ResetPasswordPage() {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-        watch,
         setValue,
         reset
     } = useForm<ResetPasswordFormData>({
@@ -36,7 +35,6 @@ function ResetPasswordPage() {
         }
     });
 
-    const password = watch('password');
 
     useEffect(() => {
         const tokenFromUrl = searchParams.get('token');

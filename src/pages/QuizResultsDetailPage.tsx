@@ -7,17 +7,13 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import AuthService from '../services/AuthService';
 import { QuizMetrics, StudentsList, StudentResultsDetail, exportAllResultsPDF, exportStudentResultPDF } from '../components';
-import type { Student, AnswerDetail, Metrics, QuizResultsNavigationState, ApiQuestionData, ApiAnswerData, BackendAttempt } from '@/types';
+import type { Student, AnswerDetail, Metrics, QuizResultsNavigationState } from '@/types';
 
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
-interface ApiResponse {
-  member?: unknown[];
-  'hydra:member'?: unknown[];
-}
 
 
 function QuizResultsDetailPage() {
@@ -38,13 +34,6 @@ function QuizResultsDetailPage() {
  
 
  
-  const getIdFromIriOrObject = (ref: string | { id: number }): number => {
-    if (typeof ref === 'string') {
-      const idStr = ref.split('/').pop() || '0';
-      return parseInt(idStr);
-    }
-    return ref.id;
-  };
 
 
   const checkAuthentication = useCallback(async (): Promise<boolean> => {
