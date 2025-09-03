@@ -47,7 +47,6 @@ export const useAuthStore = create<Auth>((set, get) => ({
       if (result.success) {
         // Récupérer les informations de l'utilisateur
         const user = await AuthService.getCurrentUser();
-        console.log('Nouvel utilisateur connecté:', user);
         
         set({ 
           user, 

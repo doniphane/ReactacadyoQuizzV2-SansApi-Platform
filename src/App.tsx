@@ -5,6 +5,8 @@ import { AuthProvider, ProtectedRoute, Layout, Footer, SmartRedirect } from './c
 import {
     LoginPage,
     RegisterPage,
+    ForgotPasswordPage,
+    ResetPasswordPage,
     AdminPage,
     StudentPage,
     TakeQuizPage,
@@ -37,6 +39,16 @@ const publicRoutes: AppRoute[] = [
         path: '/register',
         element: <RegisterPage />,
         description: 'Page d\'inscription pour tous les utilisateurs'
+    },
+    {
+        path: '/forgot-password',
+        element: <ForgotPasswordPage />,
+        description: 'Page de demande de réinitialisation de mot de passe'
+    },
+    {
+        path: '/reset-password',
+        element: <ResetPasswordPage />,
+        description: 'Page de réinitialisation de mot de passe avec token'
     },
     {
         path: '/privacy-policy-page',

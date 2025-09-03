@@ -122,6 +122,10 @@ function LoginPage() {
     const handleNavigateToRegister = (): void => {
         navigate('/register');
     };
+
+    const handleNavigateToForgotPassword = (): void => {
+        navigate('/forgot-password');
+    };
   
     const onSubmit = async (data: LoginFormData): Promise<void> => {
         // Empêcher les soumissions multiples
@@ -342,6 +346,18 @@ function LoginPage() {
 
                 
                 <LoginButton isDisabled={isFormDisabled} />
+                
+                {/* Lien mot de passe oublié */}
+                <div className="text-center">
+                    <Button
+                        variant="link"
+                        className="p-0 h-auto text-sm font-medium text-amber-500 hover:text-amber-600"
+                        onClick={handleNavigateToForgotPassword}
+                        type="button"
+                    >
+                        Mot de passe oublié ?
+                    </Button>
+                </div>
             </form>
         );
     };
