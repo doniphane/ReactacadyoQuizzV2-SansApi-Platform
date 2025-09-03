@@ -95,7 +95,7 @@ function ManageQuestionsPage() {
       setError(null);
 
       const response = await axios.get<QuizWithQuestions>(
-        `${API_BASE_URL}/api/questionnaires/${quizId}`
+        `${API_BASE_URL}/api/quizzes/${quizId}`
       );
 
       setQuiz(response.data);

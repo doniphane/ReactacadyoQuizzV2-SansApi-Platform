@@ -63,7 +63,7 @@ function QuizResultsPage() {
         }
 
         const response = await fetch(
-          `${API_BASE_URL}/api/authenticated/questionnaires/tentative/${tentativeId}`,
+          `${API_BASE_URL}/api/quizzes/play/results/${tentativeId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`

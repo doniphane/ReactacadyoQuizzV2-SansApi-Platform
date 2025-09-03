@@ -52,7 +52,7 @@ function AdminPage() {
       const token = getToken();
       if (!token) return;
 
-      const response = await fetch(`${API_BASE_URL}/api/questionnaires`, {
+      const response = await fetch(`${API_BASE_URL}/api/quizzes`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -84,13 +84,12 @@ function AdminPage() {
       const token = getToken();
       if (!token) return;
 
-      const response = await fetch(`${API_BASE_URL}/api/questionnaires/${quizId}`, {
-        method: 'PUT',
+      const response = await fetch(`${API_BASE_URL}/api/quizzes/${quizId}/toggle-status`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ estActif: !currentStatus }),
       });
 
       if (!response.ok) {
@@ -122,7 +121,7 @@ function AdminPage() {
       const token = getToken();
       if (!token) return;
 
-      const response = await fetch(`${API_BASE_URL}/api/questionnaires/${quizId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/quizzes/${quizId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

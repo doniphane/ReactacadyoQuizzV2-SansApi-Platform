@@ -133,7 +133,7 @@ function QuizResultsDetailPage() {
   
 
 
-  const makeApiCall = useCallback(async (endpoint: string): Promise<unknown[]> => {
+  const makeApiCall = useCallback(async (endpoint: string): Promise<unknown> => {
     const isAuthenticated = await checkAuthentication();
     if (!isAuthenticated) {
       toast.error('Session expirée. Veuillez vous reconnecter.');
@@ -142,15 +142,15 @@ function QuizResultsDetailPage() {
     }
 
     try {
-      const response = await axios.get(`${API_BASE_URL}${endpoint}`);
+      const response = await axios.get(`${API_BASE_URL}${endpoint}`, {
+        headers: {
+          'Authorization': `Bearer ${AuthService.getToken()}`,
+          'Content-Type': 'application/json'
+        }
+      });
       const data = response.data;
       
-   
-      if (Array.isArray(data)) {
-        return data;
-      }
-      
-      return (data as ApiResponse).member || (data as ApiResponse)['hydra:member'] || [];
+      return data;
     } catch (error) {
       console.error(`Erreur API ${endpoint}:`, error);
       throw error;
@@ -169,35 +169,17 @@ function QuizResultsDetailPage() {
       setLoading(true);
       
 
-      const attempts = await makeApiCall(`/api/tentative_questionnaires?questionnaire=${quizId}`);
-      
-    
-      const quizAttempts = attempts.filter((attempt) => {
-        const quizAttempt = attempt as BackendAttempt;
-        
-        if (typeof quizAttempt.questionnaire === 'string') {
-          return quizAttempt.questionnaire.includes(String(quizId));
-        } else if (quizAttempt.questionnaire && typeof quizAttempt.questionnaire === 'object') {
-          return (quizAttempt.questionnaire as { id: number }).id === Number(quizId);
-        }
-        return false;
-      });
+      const attempts = await makeApiCall(`/api/quizzes/${quizId}/attempts`) as any[];
 
-      
-      const studentsData: Student[] = quizAttempts.map((attempt) => {
-        const quizAttempt = attempt as BackendAttempt;
-        const percentage = quizAttempt.nombreTotalQuestions && quizAttempt.score
-          ? Math.round((quizAttempt.score / quizAttempt.nombreTotalQuestions) * 100)
-          : 0;
-
+      const studentsData: Student[] = attempts.map((attempt: any) => {
         return {
-          id: quizAttempt.id,
-          name: `${quizAttempt.prenomParticipant} ${quizAttempt.nomParticipant}`,
-          email: `${quizAttempt.prenomParticipant}${quizAttempt.nomParticipant}@gmail.com`,
-          date: new Date(quizAttempt.dateDebut).toLocaleDateString('fr-FR'),
-          score: quizAttempt.score || 0,
-          totalQuestions: quizAttempt.nombreTotalQuestions || 0,
-          percentage
+          id: attempt.id,
+          name: `${attempt.prenomParticipant} ${attempt.nomParticipant}`,
+          email: attempt.utilisateur?.email || `${attempt.prenomParticipant}.${attempt.nomParticipant}@email.com`,
+          date: new Date(attempt.dateDebut).toLocaleDateString('fr-FR'),
+          score: attempt.score || 0,
+          totalQuestions: attempt.nombreTotalQuestions || 0,
+          percentage: attempt.pourcentage || 0
         } as Student;
       });
 
@@ -214,30 +196,17 @@ function QuizResultsDetailPage() {
   const loadStudentDetails = useCallback(async (student: Student) => {
     setSelectedStudent(student);
     try {
-      
-      const [questions, userAnswers] = await Promise.all([
-        makeApiCall(`/api/questions?questionnaire=${quizId}`),
-        makeApiCall(`/api/reponse_utilisateurs?tentative=${student.id}`)
-      ]);
+      const attemptDetails = await makeApiCall(`/api/quizzes/${quizId}/attempts/${student.id}`) as any;
 
-      const quizQuestions = (questions as ApiQuestionData[]);
-      const studentUserAnswers = (userAnswers as Array<{ question: string | { id: number }; reponse: string | { id: number } }>);
+      const reponsesDetails = attemptDetails?.reponsesDetails || [];
 
-      const answersDetails: AnswerDetail[] = studentUserAnswers.map((userAnswerData) => {
-        const questionId = getIdFromIriOrObject(userAnswerData.question as string | { id: number });
-        const answerId = getIdFromIriOrObject(userAnswerData.reponse as string | { id: number });
-
-        const question = quizQuestions.find((q) => q.id === questionId);
-        const questionAnswers = (question?.reponses ?? []) as ApiAnswerData[];
-        const selectedAnswer = questionAnswers.find((a) => a.id === answerId);
-        const correctAnswer = questionAnswers.find((a) => a.estCorrecte === true);
-
+      const answersDetails: AnswerDetail[] = reponsesDetails.map((detail: any) => {
         return {
-          questionId,
-          questionText: question?.texte || 'Question non trouvée',
-          userAnswer: selectedAnswer?.texte || 'Réponse non trouvée',
-          correctAnswer: correctAnswer?.texte || 'Réponse correcte non trouvée',
-          isCorrect: selectedAnswer?.estCorrecte || false
+          questionId: detail.questionId,
+          questionText: detail.questionTexte,
+          userAnswer: detail.reponseUtilisateur?.texte || 'Aucune réponse',
+          correctAnswer: detail.bonnesReponses?.[0]?.texte || 'Réponse correcte non trouvée',
+          isCorrect: detail.estCorrecte || false
         };
       });
 

@@ -149,7 +149,7 @@ function StudentHistoryPage() {
       setIsLoading(true);
       setError(null);
       
-      const result = await callApi('/api/user/my-attempts');
+      const result = await callApi('/api/quizzes/history');
       const attemptsArray = result as ApiAttempt[];
       
       if (!attemptsArray || !Array.isArray(attemptsArray)) {
@@ -182,7 +182,7 @@ function StudentHistoryPage() {
       setLoadingDetails(true);
       setSelectedAttempt(attempt);
       
-      const attemptDetail = await callApi(`/api/user/my-attempts/${attempt.id}`) as ApiAttemptDetailResponse;
+      const attemptDetail = await callApi(`/api/quizzes/history/${attempt.id}`) as ApiAttemptDetailResponse;
       const details = transformApiAttemptDetails(attemptDetail);
       setAttemptDetails(details);
     } catch (error) {

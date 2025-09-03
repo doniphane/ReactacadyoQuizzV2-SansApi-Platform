@@ -139,7 +139,7 @@ export default function StudentAccessForm({
 			}
 
 			const response = await fetch(
-				`${API_BASE_URL}/api/authenticated/questionnaires/code/${data.quizCode.trim().toUpperCase()}`,
+				`${API_BASE_URL}/api/quizzes/play/code/${data.quizCode.trim().toUpperCase()}`,
 				{
 					method: 'GET',
 					headers: { 

@@ -119,7 +119,7 @@ function TakeQuizPage() {
       setIsLoading(true);
 
       const quizData = await makeApiCall(
-        `/api/authenticated/questionnaires/${state.quizInfo.id}`
+        `/api/quizzes/play/${state.quizInfo.id}`
       );
 
       if (quizData.questions && Array.isArray(quizData.questions)) {
@@ -184,7 +184,7 @@ function TakeQuizPage() {
 
      
       const result = await makeApiCall(
-        `/api/authenticated/questionnaires/${state.quizInfo.id}/submit`,
+        `/api/quizzes/play/${state.quizInfo.id}/submit`,
         {
           method: "POST",
           body: JSON.stringify({
