@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { UseFormRegister, FieldError } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '../store/authStore';
+import AuthService from '../services/AuthService';
 
 interface StudentFormData {
 	firstName: string;
@@ -98,6 +100,7 @@ export default function StudentAccessForm({
 }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const { user } = useAuth();
+	const navigate = useNavigate();
 
 	const {
 		register,
@@ -127,11 +130,22 @@ export default function StudentAccessForm({
 		clearErrors();
 		setIsLoading(true);
 		try {
+			// Vérifier l'authentification avant d'accéder au quiz
+			const token = AuthService.getToken();
+			if (!token) {
+				toast.error("Vous devez être connecté pour accéder à un quiz");
+				navigate("/login");
+				return;
+			}
+
 			const response = await fetch(
-				`${API_BASE_URL}/api/public/questionnaires/code/${data.quizCode.trim().toUpperCase()}`,
+				`${API_BASE_URL}/api/authenticated/questionnaires/code/${data.quizCode.trim().toUpperCase()}`,
 				{
 					method: 'GET',
-					headers: { 'Content-Type': 'application/json' }
+					headers: { 
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					}
 				}
 			);
 

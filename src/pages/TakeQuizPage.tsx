@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ChevronRight, Send } from "lucide-react";
 import toast from "react-hot-toast";
+import AuthService from "../services/AuthService";
 import type {
   TakeQuizLocationState,
   TakeQuizQuestion,
@@ -74,16 +75,30 @@ function TakeQuizPage() {
   const makeApiCall = useCallback(
     async (endpoint: string, options?: RequestInit) => {
       try {
+        // Vérifier l'authentification
+        const token = AuthService.getToken();
+        if (!token) {
+          toast.error("Vous devez être connecté pour passer un quiz");
+          navigate("/login");
+          throw new Error("Token d'authentification manquant");
+        }
+
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
           method: options?.method || "GET",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
             ...((options?.headers as Record<string, string>) || {}),
           },
           body: options?.body,
         });
 
         if (!response.ok) {
+          if (response.status === 401) {
+            toast.error("Session expirée, veuillez vous reconnecter");
+            AuthService.logout();
+            navigate("/login");
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
@@ -93,7 +108,7 @@ function TakeQuizPage() {
         throw error;
       }
     },
-    []
+    [navigate]
   );
 
   // Charger les questions du quiz
@@ -104,7 +119,7 @@ function TakeQuizPage() {
       setIsLoading(true);
 
       const quizData = await makeApiCall(
-        `/api/public/questionnaires/${state.quizInfo.id}`
+        `/api/authenticated/questionnaires/${state.quizInfo.id}`
       );
 
       if (quizData.questions && Array.isArray(quizData.questions)) {
@@ -169,12 +184,9 @@ function TakeQuizPage() {
 
      
       const result = await makeApiCall(
-        `/api/public/questionnaires/${state.quizInfo.id}/submit`,
+        `/api/authenticated/questionnaires/${state.quizInfo.id}/submit`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             prenomParticipant: state.participantData.firstName,
             nomParticipant: state.participantData.lastName,
@@ -425,10 +437,37 @@ function TakeQuizPage() {
   };
 
   useEffect(() => {
+    // Vérifier l'authentification au chargement de la page
+    const checkAuthentication = async () => {
+      try {
+        const token = AuthService.getToken();
+        if (!token) {
+          toast.error("Vous devez être connecté pour passer un quiz");
+          navigate("/login");
+          return;
+        }
+
+        const user = await AuthService.getCurrentUser();
+        if (!user) {
+          toast.error("Session expirée, veuillez vous reconnecter");
+          navigate("/login");
+          return;
+        }
+
+      } catch (error) {
+        toast.error("Erreur d'authentification");
+        navigate("/login");
+        return;
+      }
+    };
+
     if (!state?.participantData || !state?.quizInfo) {
       toast.error("Données manquantes pour le quiz");
       navigate("/student");
+      return;
     }
+
+    void checkAuthentication();
   }, [state, navigate]);
 
 

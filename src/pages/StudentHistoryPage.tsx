@@ -6,6 +6,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { AttemptsList, AttemptDetails, SearchBar } from '../components';
 import AuthService from '../services/AuthService';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 import type { TransformedAttempt, AttemptDetail } from '@/types';
 import type {
   ApiAttempt,
@@ -44,35 +45,29 @@ function StudentHistoryPage() {
   }, []);
 
  
-  const transformApiAttempt = (attempt: ApiAttempt): TransformedAttempt => {
-    const dateDebut = new Date(attempt.date);
+  const transformApiAttempt = (attempt: any): TransformedAttempt => {
+    let dateDebut: Date;
+    try {
+      dateDebut = new Date(attempt.date || attempt.dateDebut || new Date().toISOString());
+    } catch (error) {
+      dateDebut = new Date();
+    }
     
     return {
-      id: attempt.id,
-      prenomParticipant: 'Utilisateur',
-      nomParticipant: 'Connecté',
-      dateDebut: attempt.date,
-      dateFin: undefined,
-      score: attempt.score,
-      nombreTotalQuestions: attempt.nombreTotalQuestions,
-      questionnaire: `/api/questionnaires/${attempt.id}`,
-      utilisateur: `/api/utilisateurs/current`,
-
-
-
-   
-
-
-      quizTitle: attempt.questionnaireTitre || 'Quiz sans titre',
-      quizCode: attempt.questionnaireCode || 'N/A',
+      id: attempt.id || 0,
+      quizTitle: attempt.questionnaireTitre || attempt.quizTitle || attempt.titre || 'Quiz sans titre',
+      quizCode: attempt.questionnaireCode || attempt.quizCode || attempt.code || 'N/A',
       date: dateDebut.toLocaleDateString('fr-FR'),
       time: dateDebut.toLocaleTimeString('fr-FR', { 
         hour: '2-digit', 
         minute: '2-digit' 
       }),
-      percentage: attempt.pourcentage || 0,
-      isPassed: attempt.estReussi || false
-    } as unknown as TransformedAttempt;
+      score: attempt.score || 0,
+      totalQuestions: attempt.nombreTotalQuestions || attempt.totalQuestions || 0,
+      nombreTotalQuestions: attempt.nombreTotalQuestions || attempt.totalQuestions || 0,
+      percentage: attempt.pourcentage || attempt.percentage || 0,
+      isPassed: attempt.estReussi || attempt.isPassed || false
+    };
   };
 
 
@@ -118,19 +113,32 @@ function StudentHistoryPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const response = await axios.get(`${API_BASE_URL}${endpoint}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (!response.ok) {
-        throw new Error(`Erreur ${response.status}`);
+      const data = response.data;
+      
+      if (data && typeof data === 'object' && ('hydra:member' in data || 'member' in data)) {
+        const collection = data as HydraCollection<unknown>;
+        const extractedData = collection['hydra:member'] || collection.member || [];
+        return extractedData;
       }
       
-      const data: unknown = await response.json();
-      const collection = data as HydraCollection<unknown>;
-      return Array.isArray(data) ? data : (collection.member || collection['hydra:member'] || data);
+      return Array.isArray(data) ? data : data;
     } catch (error) {
-      console.error(`Erreur API ${endpoint}:`, error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          toast.error('Session expirée, veuillez vous reconnecter');
+          AuthService.logout();
+          return;
+        }
+        
+        if (error.response?.status === 404) {
+          throw new Error(`Endpoint ${endpoint} non trouvé`);
+        }
+      }
+      
       throw error;
     }
   }, [getAuthToken]);
@@ -141,21 +149,28 @@ function StudentHistoryPage() {
       setIsLoading(true);
       setError(null);
       
+      const result = await callApi('/api/user/my-attempts');
+      const attemptsArray = result as ApiAttempt[];
       
-      const attemptsArray = await callApi('/api/user/my-attempts') as ApiAttempt[];
-      
-      if (!attemptsArray) {
+      if (!attemptsArray || !Array.isArray(attemptsArray)) {
         setQuizAttempts([]);
+        toast.error('Aucun historique trouvé pour cet utilisateur');
         return;
       }
 
-     
+      if (attemptsArray.length === 0) {
+        setQuizAttempts([]);
+        toast.error('Vous n\'avez pas encore passé de quiz');
+        return;
+      }
+
       const transformedAttempts: TransformedAttempt[] = attemptsArray.map(transformApiAttempt);
-      
       setQuizAttempts(transformedAttempts);
+      toast.success(`${transformedAttempts.length} tentative(s) trouvée(s)`);
+      
     } catch (error) {
-      console.error('Erreur lors du chargement de l\'historique:', error);
       setError('Erreur lors du chargement de l\'historique des quiz');
+      toast.error('Impossible de charger l\'historique');
     } finally {
       setIsLoading(false);
     }
@@ -167,14 +182,10 @@ function StudentHistoryPage() {
       setLoadingDetails(true);
       setSelectedAttempt(attempt);
       
-      
       const attemptDetail = await callApi(`/api/user/my-attempts/${attempt.id}`) as ApiAttemptDetailResponse;
-      
-    
       const details = transformApiAttemptDetails(attemptDetail);
       setAttemptDetails(details);
     } catch (error) {
-      console.error('Erreur lors de la récupération des détails:', error);
       toast.error('Erreur lors du chargement des détails');
       setAttemptDetails([]);
     } finally {
@@ -243,7 +254,31 @@ function StudentHistoryPage() {
 
  
   useEffect(() => {
-    void loadQuizHistory();
+    const initializePage = async () => {
+      const token = AuthService.getToken();
+      if (!token) {
+        setError('Vous devez être connecté pour voir votre historique');
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const user = await AuthService.getCurrentUser();
+        
+        if (!user) {
+          setError('Erreur d\'authentification');
+          setIsLoading(false);
+          return;
+        }
+        
+        void loadQuizHistory();
+      } catch (authError) {
+        setError('Erreur d\'authentification');
+        setIsLoading(false);
+      }
+    };
+    
+    void initializePage();
   }, [loadQuizHistory]);
 
 

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import { MainResultsCard, AnswerDetailsCard, ActionsCard } from "../components";
+import AuthService from "../services/AuthService";
 
 import type {
   QuizResultsLocationState,
@@ -52,8 +54,21 @@ function QuizResultsPage() {
           score: number;
         }
 
+        // Vérifier l'authentification pour accéder aux résultats
+        const token = AuthService.getToken();
+        if (!token) {
+          toast.error("Vous devez être connecté pour voir les résultats");
+          navigate("/login");
+          return;
+        }
+
         const response = await fetch(
-          `${API_BASE_URL}/api/public/questionnaires/tentative/${tentativeId}`
+          `${API_BASE_URL}/api/authenticated/questionnaires/tentative/${tentativeId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
         );
         
         if (!response.ok) {
